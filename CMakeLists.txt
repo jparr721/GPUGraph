@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.9)
+project(gpugraph LANGUAGES CXX CUDA)
+
+include(CheckLanguage)
+check_language(CUDA)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+if(NOT DEFINED CMAKE_CUDA_STANDARD)
+  set(CMAKE_CUDA_STANDARD 14)
+  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+endif()
+
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+if (DEBUG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif(DEBUG)
+
+include_directories("${PROJECT_SOURCE_DIR}/include")
+
+add_executable(
+   "${PROJECT_NAME}"
+  "${PROJECT_SOURCE_DIR}/src/main.cu"
+)
