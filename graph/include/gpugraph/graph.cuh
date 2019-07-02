@@ -16,7 +16,7 @@ namespace graph {
     public:
       graph & operator=(const graph&) = delete;
       graph(const graph&) = delete;
-      graph() = default;
+      explicit graph(int max_capacity) : max_capacity_(max_capacity) {}
 
       ~graph();
 
@@ -24,7 +24,13 @@ namespace graph {
       void add_node(Eigen::MatrixXf node);
 
     private:
-      std::vector<Eigen::MatrixXf> nodes;
+      const int max_capacity_;
+
+      // TODO unroll tensor into cuda-readable memory and back
+      std::vector<Eigen::MatrixXf> nodes_;
+
+      // Our adjacency list
+      Eigen::MatrixXf edges_;
   };
 
   class Node {

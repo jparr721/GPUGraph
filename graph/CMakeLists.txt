@@ -1,6 +1,6 @@
 file(GLOB SOURCES "src/*.cu")
 
-add_library(initializers SHARED ${SOURCES})
+add_library(graph SHARED ${SOURCES})
 
 target_include_directories(graph
   PUBLIC

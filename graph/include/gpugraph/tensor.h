@@ -106,11 +106,6 @@ namespace graph { namespace types {
           }
         }
       }
-      void _zero_init() {}
-      void _one_init() {}
-      void _random_uniform_init() {}
-      void _random_normal_init() {}
-
   };
 
 } // namespace types
