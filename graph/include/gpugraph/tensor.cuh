@@ -10,11 +10,11 @@ namespace graph {
     float* buf;
   } tensor;
 
-  __device__ void add_item(tensor t, int x, int y, int z, float value);
-  __device__ float get_item(tensor t, int x, int y, int z);
+  __device__ void add_item(tensor t, int x, int y, float value);
+  __device__ float get_item(tensor t, int x, int y);
   __device__ tensor get_sub_tensor(const tensor t, int row, int col);
 
-  void ktensor_hadmard_product(const tensor t1, const tensor t2, tensor output);
+  void tensor_hadmard_product(const tensor t1, const tensor t2, tensor output);
   __global__ void ktensor_hadmard_product(tensor t1, tensor t2, tensor output);
 
   size_t get_size(const tensor t);

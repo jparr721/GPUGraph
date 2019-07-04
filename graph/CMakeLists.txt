@@ -1,4 +1,4 @@
-file(GLOB SOURCES "src/*.cc")
+file(GLOB SOURCES "src/*.cu")
 
 add_library(graph SHARED ${SOURCES})
 

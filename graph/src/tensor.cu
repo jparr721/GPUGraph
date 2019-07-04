@@ -2,11 +2,11 @@
 #include <gpugraph/tensor.cuh>
 
 namespace graph {
-  __device__ void tensor_add_item(tensor t, int x, int y, float value) {
+  __device__ void add_item(tensor t, int x, int y, float value) {
     t.buf[x * t.indices + y] = value;
   }
 
-  __device__ float tensor_get_item(tensor t, int x, int y) {
+  __device__ float get_item(tensor t, int x, int y) {
     return t.buf[x * t.indices + y];
   }
 
@@ -20,7 +20,7 @@ namespace graph {
   return t_sub;
   }
 
-  void ktensor_hadmard_product(const tensor t1, const tensor t2, tensor output) {
+  void tensor_hadmard_product(const tensor t1, const tensor t2, tensor output) {
     // Load our tensors into device memory
     tensor d_t1;
     d_t1.dim_x = t1.dim_x;
@@ -52,11 +52,11 @@ namespace graph {
     // Malloc the space for our temp buffer
     cudaMalloc(&d_t1.buf, t1_tensor_size);
     cudaMalloc(&d_t2.buf, t2_tensor_size);
-    cudaMalloc(&d_output, output_tensor_size);
+    cudaMalloc(&d_output.buf, output_tensor_size);
 
     // Copy our host structures to the device structure
-    cudaMemcpy(d_t1.buf, t1.buf, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_t2.buf, t2.buf, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_t1.buf, t1.buf, t1_tensor_size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_t2.buf, t2.buf, t2_tensor_size, cudaMemcpyHostToDevice);
 
     // Invoke our hadmard product kernel
     dim3 dim_block(block_size, block_size);
@@ -69,9 +69,9 @@ namespace graph {
         output.buf, d_output.buf, output_tensor_size, cudaMemcpyDeviceToHost);
 
     // Free memory
-    cudaFree(d_t1);
-    cudaFree(d_t2);
-    cudaFree(d_output);
+    cudaFree(d_t1.buf);
+    cudaFree(d_t2.buf);
+    cudaFree(d_output.buf);
   }
 
   __global__ void ktensor_hadmard_product(tensor t1, tensor t2, tensor output) {
@@ -106,7 +106,7 @@ namespace graph {
       t2_s[row][col] = get_item(t2_sub, row, col);
 
       // Synchronize
-      _syncThreads();
+      __syncthreads();
 
       // Do tensor multiplication
       for (int jj = 0; jj < block_size; ++jj) {
@@ -114,7 +114,7 @@ namespace graph {
       }
 
       // Synchronize
-      _syncThreads();
+      __syncthreads();
     }
   }
 
