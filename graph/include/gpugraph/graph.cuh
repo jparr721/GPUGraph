@@ -4,16 +4,16 @@
 #include <gpugraph/tensor.cuh>
 
 namespace graph {
-  // Neural Network Node
+  // Graph Node
   typedef struct {
     unsigned int connections;
     tensor data;
-  } n_node;
+  } g_node;
 
   struct graph_memory {
-    const float* graph;
-    const float* nodes;
-    const float* edges;
+    float* graph;
+    float* nodes;
+    float* edges;
     int n_edges;
     int n_nodes;
   };
@@ -27,7 +27,7 @@ namespace graph {
       ~graph();
 
       void add_edge(int x1, int y1, int x2, int y2);
-      void add_node(int x, int y, n_node data);
+      void add_node(int x, int y, g_node data);
     private:
       // Our block size
       constexpr static int block_size = 64;

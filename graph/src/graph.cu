@@ -15,8 +15,8 @@ namespace graph {
 
   graph::~graph() {
     // Clean up our graph memory
-    cudaFree((void*)d_mem_.graph);
-    cudaFree((void*)d_mem_.nodes);
-    cudaFree((void*)d_mem_.edges);
+    cudaFree(d_mem_.graph);
+    cudaFree(d_mem_.nodes);
+    cudaFree(d_mem_.edges);
   }
 } // namespace graph
