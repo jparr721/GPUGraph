@@ -20,8 +20,6 @@ if (DEBUG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif(DEBUG)
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-
 include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
