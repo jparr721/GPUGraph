@@ -2,15 +2,15 @@
 #include <gpugraph/tensor.cuh>
 
 namespace graph {
-  __device__ void add_item(tensor t, int x, int y, float value) {
+  __device__ void d_add_item(tensor t, int x, int y, float value) {
     t.buf[x * t.indices + y] = value;
   }
 
-  __device__ float get_item(tensor t, int x, int y) {
+  __device__ float d_get_item(tensor t, int x, int y) {
     return t.buf[x * t.indices + y];
   }
 
-  __device__ tensor get_sub_tensor(const tensor t, int row, int col) {
+  __device__ tensor d_get_sub_tensor(const tensor t, int row, int col) {
     tensor t_sub;
     t_sub.dim_x = block_size;
     t_sub.dim_y = block_size;
@@ -18,6 +18,10 @@ namespace graph {
     t_sub.buf = &t.buf[t.indices * block_size * row + block_size * col];
 
   return t_sub;
+  }
+
+  void add_item(tensor &t, int x, int y, int z, float data) {
+    t.buf[x + y + z] = data;
   }
 
   void tensor_hadmard_product(const tensor t1, const tensor t2, tensor output) {
@@ -79,7 +83,7 @@ namespace graph {
     int block_col = blockIdx.x;
 
     // Each thread gets a subsection
-    tensor t_sub = get_sub_tensor(output, block_row, block_col);
+    tensor t_sub = d_get_sub_tensor(output, block_row, block_col);
 
     // Our accumulator
     float output_value = 0;
@@ -92,18 +96,18 @@ namespace graph {
     #pragma unroll
     for (int ii = 0; ii < (t1.dim_x / block_size); ++ii) {
        // Get sub tensor of t1
-      tensor t1_sub = get_sub_tensor(t1, block_row, ii);
+      tensor t1_sub = d_get_sub_tensor(t1, block_row, ii);
 
       // Get sub tensor of t2
-      tensor t2_sub = get_sub_tensor(t2, block_row, ii);
+      tensor t2_sub = d_get_sub_tensor(t2, block_row, ii);
 
       // Store them in shared memory
       __shared__ float t1_s[block_size][block_size];
       __shared__ float t2_s[block_size][block_size];
 
       // Load the sub tensors from memory
-      t1_s[row][col] = get_item(t1_sub, row, col);
-      t2_s[row][col] = get_item(t2_sub, row, col);
+      t1_s[row][col] = d_get_item(t1_sub, row, col);
+      t2_s[row][col] = d_get_item(t2_sub, row, col);
 
       // Synchronize
       __syncthreads();
