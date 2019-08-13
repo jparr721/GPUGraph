@@ -1,3 +1,4 @@
+project(graph)
 file(GLOB SOURCES "src/*.cu")
 
 add_library(graph SHARED ${SOURCES})

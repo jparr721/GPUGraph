@@ -1,18 +1,21 @@
 #pragma once
 
+#include <string>
+#include <map>
 #include <vector>
+
 #include <gpugraph/tensor.cuh>
 
 namespace graph {
   // Graph Node
   typedef struct {
+    std::string name;
     unsigned int connections;
     tensor data;
   } g_node;
 
   struct graph_memory {
     float* graph;
-    float* nodes;
     float* edges;
     int n_edges;
     int n_nodes;
@@ -20,23 +23,37 @@ namespace graph {
 
   class graph {
     public:
+      using adjacency_list = std::map<g_node, std::vector<g_node>>;
+
       graph & operator=(const graph&) = delete;
       graph(const graph&) = delete;
-      explicit graph(size_t max_capacity);
+      explicit graph(size_t max_capacity) : max_capacity_(max_capacity) {}
 
       ~graph();
 
-      void add_edge(int x1, int y1, int x2, int y2);
-      void add_node(int x, int y, g_node data);
+      void add_edge(const g_node& source, const g_node& new_node);
+
+      void safe_add_node(const g_node& new_node);
+      void unsafe_add_node(const g_node& new_node);
+
+      void build();
+
+      bool built() { return is_built_; }
+
+      adjacency_list get_digraph() { return digraph_; }
     private:
       // Our block size
       constexpr static int block_size = 64;
 
+      bool is_built_ = false;
+
       // Initialize our device bound shared memory block
       graph_memory d_mem_;
 
-      // Our host adjacency list
-      std::vector<std::vector<int>> adjacencies_;
+      // Make our adjacency list
+      adjacency_list digraph_;
+
+      size_t max_capacity_ = 0;
   };
 
   __global__ void kadd_edge(graph_memory mem, int x1, int y1, int x2, int y2);

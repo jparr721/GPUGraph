@@ -24,6 +24,10 @@ namespace graph {
     t.buf[x + y + z] = data;
   }
 
+  float get_item(const tensor &t, int x, int y, int z) {
+    return t.buf[x + y + z];
+  }
+
   void tensor_hadmard_product(const tensor t1, const tensor t2, tensor output) {
     // Load our tensors into device memory
     tensor d_t1;
